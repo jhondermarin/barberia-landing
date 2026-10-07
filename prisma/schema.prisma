@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Servicio {
+  id           Int      @id @default(autoincrement())
+  nombre       String
+  descripcion  String?
+  precio       Decimal  @db.Decimal(10, 2)
+  duracionMin  Int      @map("duracion_min")
+  citas        Cita[]
+
+  @@map("servicios")
+}
+
+model Producto {
+  id           Int           @id @default(autoincrement())
+  nombre       String
+  descripcion  String?
+  precio       Decimal       @db.Decimal(10, 2)
+  stock        Int           @default(0)
+  imagenUrl    String?       @map("imagen_url")
+  categoria    String?
+  pedidoItems  PedidoItem[]
+
+  @@map("productos")
+}
+
+model Cita {
+  id             Int      @id @default(autoincrement())
+  nombreCliente  String   @map("nombre_cliente")
+  telefono       String
+  servicioId     Int      @map("servicio_id")
+  servicio       Servicio @relation(fields: [servicioId], references: [id])
+  fecha          DateTime @db.Date
+  hora           DateTime @db.Time
+  estado         String   @default("pendiente")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("citas")
+}
+
+model Faq {
+  id         Int     @id @default(autoincrement())
+  pregunta   String
+  respuesta  String
+  categoria  String?
+
+  @@map("faqs")
+}
+
+model Pedido {
+  id              Int           @id @default(autoincrement())
+  clienteNombre   String        @map("cliente_nombre")
+  telefono        String
+  total           Decimal       @db.Decimal(10, 2)
+  estado          String        @default("pendiente")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  items           PedidoItem[]
+
+  @@map("pedidos")
+}
+
+model PedidoItem {
+  id              Int      @id @default(autoincrement())
+  pedidoId        Int      @map("pedido_id")
+  pedido          Pedido   @relation(fields: [pedidoId], references: [id])
+  productoId      Int      @map("producto_id")
+  producto        Producto @relation(fields: [productoId], references: [id])
+  cantidad        Int
+  precioUnitario  Decimal  @db.Decimal(10, 2) @map("precio_unitario")
+
+  @@map("pedido_items")
+}

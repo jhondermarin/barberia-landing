@@ -4,7 +4,6 @@ import Contacto from "@/components/sections/Contacto";
 import Galeria from "@/components/sections/Galeria";
 import Homep from "@/components/sections/Home";
 import Servicios from "@/components/sections/Servicios";
-import { Contact } from "lucide-react";
 import Reserva from "@/components/sections/Reserva";
 import {prisma} from "@/lib/prisma";
 import Catalogo from "@/components/sections/Catalogo";
